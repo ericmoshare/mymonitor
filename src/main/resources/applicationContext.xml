@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+        default-lazy-init="false">
+
+    <!--
+        spring依赖注入的方法:
+        1. 构造器 constructor-arg
+        2. 静态工厂 factory-method
+        3. setter方法
+    -->
+    <bean id="duke" class="org.springinaction.springidol.Juggler">
+        <constructor-arg value="15" />
+    </bean>
+
+    <bean id="dog" class="org.springinaction.springidol.Dog" factory-method="getInstance" init-method="initMethod" destroy-method="destoryMethod" />
+
+    <bean id="dogMaster" class="org.springinaction.springidol.DogMaster">
+        <!--  <property name="dog" ref="dog"></property>-->
+        <property name="dog" value="#{dog.getInstance()}" />
+    </bean>
+
+    <context:annotation-config />
+    <context:component-scan base-package="org.springinaction.springidol" />
+    
+</beans>

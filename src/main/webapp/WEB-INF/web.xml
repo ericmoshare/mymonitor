@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>checkfile gateway</display-name>
+
+    <servlet>
+        <servlet-name>OrderDistributeServlet</servlet-name>
+        <servlet-class>com.feisheng.servlet.order.OrderDistributeServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OrderDistributeServlet</servlet-name>
+        <url-pattern>/v3.0.0/order_distribute.php</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OrderCancelServlet</servlet-name>
+        <servlet-class>com.feisheng.servlet.order.OrderCancelServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OrderCancelServlet</servlet-name>
+        <url-pattern>/v3.0.0/cancel_order.php</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PropertyChangeServlet</servlet-name>
+        <servlet-class>com.feisheng.servlet.property.PropertyChangeServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>PropertyChangeServlet</servlet-name>
+        <url-pattern>/property/change</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PropertyQueryServlet</servlet-name>
+        <servlet-class>com.feisheng.servlet.property.PropertyQueryServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>PropertyQueryServlet</servlet-name>
+        <url-pattern>/property/query</url-pattern>
+    </servlet-mapping>
+
+</web-app>
+

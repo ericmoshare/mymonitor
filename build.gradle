@@ -1,0 +1,54 @@
+version = ''
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+
+repositories {
+    maven {
+        url 'http://repo.maven.apache.org/maven2'
+        //url 'http://mvnrepository.com/artifact'
+    }
+}
+
+String springVersion = '4.1.0.RELEASE'  
+String slf4jVersion = '1.7.7' 
+String logbackVersion = '1.0.11'
+String lombokVersion = '1.14.0'
+
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+dependencies {
+    providedCompile('javax.servlet:javax.servlet-api:3.0.1')
+
+    compile(
+            //lombok
+            'org.projectlombok:lombok:1.14.0',
+            
+            //log core
+            'org.slf4j:slf4j-api:' + slf4jVersion,
+            'ch.qos.logback:logback-core:' + logbackVersion,
+            'ch.qos.logback:logback-classic:' + logbackVersion,
+            'org.codehaus.groovy:groovy-all:2.3.10',
+            
+            'commons-io:commons-io:2.4',
+            'com.alibaba:fastjson:1.2.29',
+            "org.apache.commons:commons-lang3:3.3.2"
+            
+    )
+
+    //core spring  
+    compile ('org.springframework:spring-context:' + springVersion)  
+    compile ('org.springframework:spring-core:' + springVersion)  
+    compile ('org.springframework:spring-webmvc:' + springVersion)  
+
+    //aspects  
+    compile 'org.aspectj:aspectjrt:1.8.2'  
+    compile 'org.aspectj:aspectjweaver:1.8.2'  
+	
+	//test
+	//compile('org.mockito:mockito-all:1.9.0')
+	
+	testCompile group: 'junit', name: 'junit', version: '4.11'  
+    testCompile "org.mockito:mockito-all:1.9.0"  
+	testCompile 'org.springframework:spring-test:' + springVersion  
+}
