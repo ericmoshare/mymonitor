@@ -7,9 +7,9 @@
     </appender>
 
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/apps/logs/mvc/mvc.log</file>
+        <file>/apps/logs/bcgflow/bcgflow.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/apps/logs/mvc/mvc.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/apps/logs/bcgflow/bcgflow.%d{yyyy-MM-dd}.log</fileNamePattern>
         </rollingPolicy>
         <encoder>
             <pattern>%date{HH:mm:ss.SSS} %-5level - %msg%n</pattern>
@@ -18,6 +18,6 @@
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <!--<appender-ref ref="ROLLING"/>-->
+        <appender-ref ref="ROLLING"/>
     </root>
 </configuration>

@@ -34,7 +34,7 @@ public class BcgFlowMonitor {
     }
 
     public static void main(String[] args) throws Exception {
-        BcgFlowListener listener = new BcgFlowListener();
+        BcgFlowListener listener = new BcgFlowListener(LogLevel.INFO);
         BcgFlowMonitor bcgFlowMonitor = new BcgFlowMonitor(TimeUnit.SECONDS.toMillis(2));
         bcgFlowMonitor.monitor("D:\\download\\", listener);
         bcgFlowMonitor.start();

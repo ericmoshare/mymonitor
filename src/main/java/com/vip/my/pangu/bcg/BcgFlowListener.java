@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by eric on 2017/4/18.
@@ -21,11 +19,19 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class BcgFlowListener implements FileAlterationListener {
 
-    final static String formular = "%s,心跳:%s, 渠道:%s, 发卡行:%s, 业务类型:%s, 调用:%s, 耗时:%s ms, 结论:%s";
-
     private static final Logger log = LoggerFactory.getLogger(BcgFlowListener.class);
 
-    private static Map<String, Integer> indexOfMap = new ConcurrentHashMap<>();
+    private static Map<String, Set<String>> data = new ConcurrentHashMap<>();
+
+    private LogLevel logLevel;
+
+    public BcgFlowListener() {
+        this.logLevel = LogLevel.WARN;
+    }
+
+    public BcgFlowListener(LogLevel logLevel) {
+        this.logLevel = logLevel;
+    }
 
     @Override
     public void onStart(FileAlterationObserver observer) {
@@ -74,85 +80,85 @@ public class BcgFlowListener implements FileAlterationListener {
         List<String> list;
         try {
             list = FileUtils.readLines(file);
+
+            int size = list.size();
+            int gap = 20;
+            if (size > gap) {
+                list = list.subList(size - gap, size);
+            }
         } catch (IOException e) {
-            //log.info("read file:{} failed,{}", file.getName(), e.getMessage());
             return;
         }
-        String filename = file.getName();
-        int size = list.size();
 
-        int index;
-        if (indexOfMap.get(file.getName()) == null) {
-            //首次打印,只打印倒数2行
-            index = size - getRightIndex(size);
-        } else {
-            // 二次打印, 打印累积数据
-            index = indexOfMap.get(file.getName());
-        }
+        Set<String> set = refreshData(file.getName(), list);
 
         try {
-            for (int i = index; i < size; i++) {
-                print(prepareData(list, i));
+            Iterator<String> it = set.iterator();
+            while (it.hasNext()) {
+                FlowHelper holder = new FlowHelper(it.next());
+                print(holder.format());
             }
         } catch (Exception e) {
-            //log.warn("[prepareData]cause error,{}", e.getMessage());
-        } finally {
-            indexOfMap.put(filename, size - 1);
+            //log.warn("[printLog]cause error,{}", e.getMessage(), e);
         }
     }
 
-    private int getRightIndex(int size) {
-        if (size <= 1) {
-            return size;
-        }
-        return 2;
+    private Set<String> refreshData(String key, List<String> target) {
+        Set<String> last = data.getOrDefault(key, new TreeSet<>());
+        Set<String> set = clean(target);
+
+        data.put(key, set);
+
+        Set<String> tmp = new TreeSet<>(set);
+        tmp.removeAll(last);
+        return tmp;
     }
 
-    private String prepareData(List<String> list, int index) throws Exception {
-        String content = list.get(index);
-        String[] clips = content.split("\\,");
-        String respCode = clips[4];
-        long costTime = Long.valueOf(getCostTime(clips));
-        String result = getResultByCondition(respCode, costTime);
-        return String.format(formular, index, getHeartBeat(clips[0]), getRouteOrg(clips[0]), clips[1], clips[2], clips[4], costTime, result);
-    }
+    private Set<String> clean(Collection<String> target) {
+        Set<String> result = new TreeSet<>();
+        Iterator<String> it = target.iterator();
+        while (it.hasNext()) {
 
-    private String getRouteOrg(String clip) {
-        int index = clip.indexOf("F2P");
-        return clip.substring(index, clip.length());
-    }
-
-    private String getHeartBeat(String clip) {
-        String[] subClips = clip.split("\\ ");
-        return subClips[1].substring(0, subClips[1].length() - 1);
-    }
-
-    private String getCostTime(String[] clips) {
-        return clips[clips.length - 1];
-    }
-
-    private String getResultByCondition(String respCode, long costTime) {
-        if ("SUCCESS".contains(respCode)) {
-            long maxWarningTime = TimeUnit.SECONDS.toMillis(2);
-            if (costTime > maxWarningTime) {
-                return "耗时超" + TimeUnit.MILLISECONDS.toSeconds(maxWarningTime) + "秒";
-            } else {
-                return "正常";
+            String plain = it.next();
+            int index = plain.lastIndexOf("[201");
+            if (index > 0) {
+                plain = plain.substring(index, plain.length());
+                //System.out.println(plain);
             }
+
+            result.add(plain);
         }
-        return "不正常";
+        return result;
     }
 
     private void print(String msg) {
-        if (msg.contains("不正常")) {
+        if (msg.contains(FlowHelper.SUCCESS_MSG)) {
+            if (logLevel == LogLevel.INFO) {
+                log.info(msg);
+            }
+        } else if (msg.contains(FlowHelper.CONNECTION_ERROR)) {
             log.error(msg);
         } else {
-            if (msg.contains("耗时超")) {
-                log.warn(msg);
-            } else {
-                log.info(msg);
-
-            }
+            log.warn(msg);
         }
     }
+
+    public static void main(String[] args) {
+        String msg = "1 2 ";
+        List<String> list = Arrays.asList(msg.split(" "));
+        BcgFlowListener bcg = new BcgFlowListener();
+
+        bcg.refreshData("9", list);
+        for (int i = 10; i < 15; i++) {
+            bcg.refreshData("9", list);
+            msg += i + " ";
+            list = Arrays.asList(msg.split(" "));
+            //System.out.println(JSON.toJSONString(list));
+            bcg.refreshData("9", list);
+            //System.out.println(JSON.toJSONString(list));
+        }
+
+    }
 }
+
+
