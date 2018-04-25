@@ -1,12 +1,13 @@
-version = ''
 apply plugin: 'war'
 apply plugin: 'eclipse-wtp'
 
 repositories {
-    maven {
-        url 'http://repo.maven.apache.org/maven2'
-        //url 'http://mvnrepository.com/artifact'
-    }
+//    maven {
+//        //url 'http://repo.maven.apache.org/maven2'
+//        //url 'http://mvnrepository.com/artifact'
+//
+//    }
+    mavenCentral()
 }
 
 String springVersion = '4.1.0.RELEASE'  
